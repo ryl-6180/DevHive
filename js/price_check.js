@@ -18,6 +18,7 @@ shopCodeInput.type = "text";
 // shopCodeInput.value = "z-mall";
 shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
 shopCodeInput.style.fontSize = "1rem";
+shopCodeInput.style.width = "17rem";
 formDiv.appendChild(shopCodeInput);
 
 const executeButton = document.createElement("button");
