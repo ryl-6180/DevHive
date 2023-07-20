@@ -10,6 +10,7 @@ function setStyles(element, styles) {
 
 // 商品価格を取得してaタグに追加する関数
 function addPriceToLink(apiEndpoint, link, keyword) {
+	console.log('addPriceToLink');
 	fetch(apiEndpoint)
 		.then((response) => response.json())
 		.then((data) => {
@@ -43,6 +44,7 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(links, currentIndex) {
+	console.log('executeRequestsSequentially');
 	if (currentIndex >= links.length) {
 		return; // リンクの全ての要素を処理したら終了
 	}
@@ -75,3 +77,4 @@ for (let i = 0; i < allLinks.length; i++) {
 }
 // リクエストを1秒ずつ間隔を空けて実行する
 executeRequestsSequentially(matchedLinks, 0);
+console.log('カカクチェック');
