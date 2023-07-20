@@ -39,15 +39,14 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 				}
 				count++;
 			}
-			alert('オワリマシタ');
 		})
 		.catch((error) => console.error("Error:", error));
-		alert('エラー：コンソールを確認してください')
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(links, currentIndex) {
 	if (currentIndex >= links.length) {
+		alert('オワリマシタ')
 		return; // リンクの全ての要素を処理したら終了
 	}
 
