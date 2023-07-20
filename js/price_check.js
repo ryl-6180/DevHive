@@ -1,4 +1,26 @@
-const shopCode = "z-mall";
+// JSでフォームを作成して追加
+const formDiv = document.createElement("div");
+formDiv.style.position = "fixed";
+formDiv.style.top = "20px";
+formDiv.style.right = "20px";
+
+const shopCodeInput = document.createElement("input");
+shopCodeInput.id = "shopCodeInput";
+shopCodeInput.type = "text";
+// shopCodeInput.value = "z-mall";
+shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
+formDiv.appendChild(shopCodeInput);
+
+const executeButton = document.createElement("button");
+executeButton.textContent = "実行";
+executeButton.addEventListener("click", startPriceCheck);
+formDiv.appendChild(executeButton);
+
+document.body.appendChild(formDiv);
+
+
+
+// アプリケーションIDを指定
 const applicationId = "1008693261382501115";
 
 // ヘルパーメソッド: スタイルを設定する関数
@@ -44,13 +66,14 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
-function executeRequestsSequentially(links, currentIndex) {
+function executeRequestsSequentially(shopCode, links, currentIndex) {
 	if (currentIndex >= links.length) {
-		alert('オワリマシタ')
+		alert("オワリマシタ");
 		return; // リンクの全ての要素を処理したら終了
 	}
 
 	let link = links[currentIndex];
+	console.log(link);
 	let url = link.href.split("/");
 	url.pop();
 	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url.pop() + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
@@ -59,23 +82,27 @@ function executeRequestsSequentially(links, currentIndex) {
 
 	// 次のリクエストを1秒後に実行する
 	setTimeout(function () {
-		executeRequestsSequentially(links, currentIndex + 1);
+		executeRequestsSequentially(shopCode, links, currentIndex + 1);
 	}, 500);
 }
+// 実行ボタンをクリックしたときに処理を開始する関数
+function startPriceCheck() {
+	const inputElement = document.getElementById("shopCodeInput");
+	const shopCode = inputElement.value;
+	// ページ内のすべてのaタグを取得
+	let allLinks = document.getElementsByTagName("a");
+	let pattern = new RegExp("https://item\\.rakuten\\.co\\.jp/" + shopCode + "/[\\d\\-_]+");
 
-// ページ内のすべてのaタグを取得
-let allLinks = document.getElementsByTagName("a");
-let pattern = new RegExp("https://item\\.rakuten\\.co\\.jp/" + shopCode + "/[\\d\\-_]+");
-
-let matchedLinks = [];
-// 取得したすべてのaタグに対してループ処理
-for (let i = 0; i < allLinks.length; i++) {
-	let link = allLinks[i];
-	// リンクのURLが指定したパターンに一致するかチェック
-	if (pattern.test(link.href)) {
-		matchedLinks.push(link);
+	let matchedLinks = [];
+	// 取得したすべてのaタグに対してループ処理
+	for (let i = 0; i < allLinks.length; i++) {
+		let link = allLinks[i];
+		// リンクのURLが指定したパターンに一致するかチェック
+		if (pattern.test(link.href)) {
+			matchedLinks.push(link);
+		}
 	}
+	// リクエストを1秒ずつ間隔を空けて実行する
+	console.log("価格チェック開始");
+	executeRequestsSequentially(shopCode, matchedLinks, 0);
 }
-// リクエストを1秒ずつ間隔を空けて実行する
-console.log('価格チェック開始');
-executeRequestsSequentially(matchedLinks, 0);
