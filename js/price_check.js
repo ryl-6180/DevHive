@@ -39,10 +39,10 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 				}
 				count++;
 			}
-			alart('オワリマシタ');
+			alert('オワリマシタ');
 		})
 		.catch((error) => console.error("Error:", error));
-		alart('エラー：コンソールを確認してください')
+		alert('エラー：コンソールを確認してください')
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
