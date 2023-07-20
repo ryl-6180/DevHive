@@ -15,7 +15,6 @@ appLabel.style.fontSize = "1rem";
 const shopCodeInput = document.createElement("input");
 shopCodeInput.id = "shopCodeInput";
 shopCodeInput.type = "text";
-// shopCodeInput.value = "z-mall";
 shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
 shopCodeInput.style.fontSize = "1rem";
 shopCodeInput.style.width = "17rem";
@@ -88,7 +87,6 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(shopCode, links, currentIndex) {
 	if (currentIndex >= links.length) {
-		progressCounter.innerHTML = "進捗（" + (currentIndex + 1) + " / " + (links.length + 1) + "）";
 		console.log("おわった");
 		alert("オワリマシタ");
 		return; // リンクの全ての要素を処理したら終了
@@ -96,16 +94,15 @@ function executeRequestsSequentially(shopCode, links, currentIndex) {
 
 	let link = links[currentIndex];
 	let url = link.href.split("/");
-	url.pop();
-	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url.pop() + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
+	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url[3] + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
 	// 商品価格を取得してaタグに追加する関数を呼び出す
 	addPriceToLink(apiEndpoint, link, link.href.split("/").pop());
 
-	progressCounter.innerHTML = "進捗（" + (currentIndex + 1) + " / " + (links.length + 1) + "）";
+	progressCounter.innerHTML = "進捗（" + (currentIndex + 1) + " / " + links.length + "）";
 	// 次のリクエストを1秒後に実行する
 	setTimeout(function () {
 		executeRequestsSequentially(shopCode, links, currentIndex + 1);
-	}, 500);
+	}, 400);
 }
 // 実行ボタンをクリックしたときに処理を開始する関数
 function startPriceCheck() {
