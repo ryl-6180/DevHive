@@ -4,21 +4,26 @@ formDiv.style.position = "fixed";
 formDiv.style.top = "20px";
 formDiv.style.right = "20px";
 
+const appLabel = document.createElement("label");
+appLabel.value = "価格チェック";
+appLabel.style.display = "block";
+appLabel.style.fontSize = "1rem";
+
 const shopCodeInput = document.createElement("input");
 shopCodeInput.id = "shopCodeInput";
 shopCodeInput.type = "text";
 // shopCodeInput.value = "z-mall";
 shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
+shopCodeInput.style.fontSize = "1rem";
 formDiv.appendChild(shopCodeInput);
 
 const executeButton = document.createElement("button");
 executeButton.textContent = "実行";
 executeButton.addEventListener("click", startPriceCheck);
+executeButton.style.fontSize = "1rem";
 formDiv.appendChild(executeButton);
 
 document.body.appendChild(formDiv);
-
-
 
 // アプリケーションIDを指定
 const applicationId = "1008693261382501115";
