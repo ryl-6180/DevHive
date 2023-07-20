@@ -60,22 +60,18 @@ function executeRequestsSequentially(links, currentIndex) {
 	}, 500);
 }
 
-// JavaScriptの例
-// ページのロードが完了した後に実行する
-window.onload = function () {
-	// ページ内のすべてのaタグを取得
-	let allLinks = document.getElementsByTagName("a");
-	let pattern = new RegExp("https://item\\.rakuten\\.co\\.jp/" + shopCode + "/[\\d\\-_]+");
+// ページ内のすべてのaタグを取得
+let allLinks = document.getElementsByTagName("a");
+let pattern = new RegExp("https://item\\.rakuten\\.co\\.jp/" + shopCode + "/[\\d\\-_]+");
 
-	let matchedLinks = [];
-	// 取得したすべてのaタグに対してループ処理
-	for (let i = 0; i < allLinks.length; i++) {
-		let link = allLinks[i];
-		// リンクのURLが指定したパターンに一致するかチェック
-		if (pattern.test(link.href)) {
-			matchedLinks.push(link);
-		}
+let matchedLinks = [];
+// 取得したすべてのaタグに対してループ処理
+for (let i = 0; i < allLinks.length; i++) {
+	let link = allLinks[i];
+	// リンクのURLが指定したパターンに一致するかチェック
+	if (pattern.test(link.href)) {
+		matchedLinks.push(link);
 	}
-	// リクエストを1秒ずつ間隔を空けて実行する
-	executeRequestsSequentially(matchedLinks, 0);
-};
+}
+// リクエストを1秒ずつ間隔を空けて実行する
+executeRequestsSequentially(matchedLinks, 0);
