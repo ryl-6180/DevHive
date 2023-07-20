@@ -103,7 +103,7 @@ function executeRequestsSequentially(shopCode, links, currentIndex) {
 	// 次のリクエストを1秒後に実行する
 	setTimeout(function () {
 		executeRequestsSequentially(shopCode, links, currentIndex + 1);
-	}, 400);
+	}, 500);
 }
 // 実行ボタンをクリックしたときに処理を開始する関数
 function startPriceCheck() {
