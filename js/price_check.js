@@ -10,11 +10,11 @@ function setStyles(element, styles) {
 
 // 商品価格を取得してaタグに追加する関数
 function addPriceToLink(apiEndpoint, link, keyword) {
-	console.log('addPriceToLink');
 	fetch(apiEndpoint)
 		.then((response) => response.json())
 		.then((data) => {
 			const items = data.Items;
+			let count = 0;
 			for (const item of items) {
 				if (item.Item.itemUrl.endsWith(keyword)) {
 					const price = item.Item.itemPrice + "円"; // 商品価格を取得
@@ -37,14 +37,16 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					link.parentNode.insertBefore(wrapperDiv, link);
 					break;
 				}
+				count++;
 			}
+			alart('オワリマシタ');
 		})
 		.catch((error) => console.error("Error:", error));
+		alart('エラー：コンソールを確認してください')
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(links, currentIndex) {
-	console.log('executeRequestsSequentially');
 	if (currentIndex >= links.length) {
 		return; // リンクの全ての要素を処理したら終了
 	}
@@ -76,5 +78,5 @@ for (let i = 0; i < allLinks.length; i++) {
 	}
 }
 // リクエストを1秒ずつ間隔を空けて実行する
+console.log('価格チェック開始');
 executeRequestsSequentially(matchedLinks, 0);
-console.log('カカクチェック');
