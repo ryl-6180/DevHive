@@ -9,17 +9,18 @@ formDiv.style.border = "2px solid #f00";
 formDiv.style.padding = "0.5rem";
 
 const appLabel = document.createElement("label");
-appLabel.value = "価格チェック";
+appLabel.innerHTML = "ショップコードを入力してください";
 appLabel.style.display = "block";
 appLabel.style.fontSize = "1rem";
+formDiv.appendChild(appLabel);
 
 const shopCodeInput = document.createElement("input");
 shopCodeInput.id = "shopCodeInput";
 shopCodeInput.type = "text";
 // shopCodeInput.value = "z-mall";
-shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
+shopCodeInput.placeholder = "z-craft"; // テキストボックスにプレースホルダーを追加
 shopCodeInput.style.fontSize = "1rem";
-shopCodeInput.style.width = "17rem";
+shopCodeInput.style.width = "10rem";
 formDiv.appendChild(shopCodeInput);
 
 const executeButton = document.createElement("button");
@@ -51,16 +52,15 @@ function setStyles(element, styles) {
 	}
 }
 
-
 function checkURLContainsSpecificString(url, searchString) {
-  return url.includes(searchString);
+	return url.includes(searchString);
 }
 
 // 商品価格を取得してaタグに追加する関数
 function addPriceToLink(apiEndpoint, link, keyword) {
 	// console.log(apiEndpoint);
 	// console.log(link);
-	console.log("keyword",keyword);
+	// console.log("keyword",keyword);
 	fetch(apiEndpoint)
 		.then((response) => response.json())
 		.then((data) => {
@@ -69,7 +69,7 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 				throw new Error("在庫切れ？");
 			}
 			for (const item of items) {
-				console.log(item.Item.itemUrl);
+				// console.log(item.Item.itemUrl);
 				const url = item.Item.itemUrl;
 				const searchString = keyword;
 				const isMatch = checkURLContainsSpecificString(url, searchString);
@@ -106,7 +106,7 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 						padding: "1rem",
 					});
 					// 要素にテキストノードを追加
-					wrapperDiv.appendChild(document.createTextNode("取得できませんでした"));
+					wrapperDiv.appendChild(document.createTextNode("取得エラー"));
 					// aタグの前に新しい要素を挿入
 					link.parentNode.insertBefore(wrapperDiv, link);
 				}
@@ -126,7 +126,7 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 				padding: "1rem",
 			});
 			// 要素にテキストノードを追加
-			wrapperDiv.appendChild(document.createTextNode("取得できませんでした"));
+			wrapperDiv.appendChild(document.createTextNode("取得エラー"));
 			// aタグの前に新しい要素を挿入
 			link.parentNode.insertBefore(wrapperDiv, link);
 		});
@@ -135,18 +135,18 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(shopCode, links, currentIndex) {
 	if (currentIndex >= links.length) {
-		console.log("おわった");
-		alert("オワリマシタ");
+		console.log("価格チェック終了");
+		alert("チェック完了しました！");
 		return; // リンクの全ての要素を処理したら終了
 	}
 
 	let link = links[currentIndex];
 	let url = link.href.split("/");
-	console.log(url[4]);
+	// console.log(url[4]);
 	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url[4] + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
 	// 商品価格を取得してaタグに追加する関数を呼び出す
-	console.log(link.href.split("/").pop());
-	console.log("url[4]",url[4]);
+	// console.log(link.href.split("/").pop());
+	// console.log("url[4]",url[4]);
 	addPriceToLink(apiEndpoint, link, url[4]);
 
 	progressCounter.innerHTML = "進捗（" + (currentIndex + 1) + " / " + links.length + "）";
