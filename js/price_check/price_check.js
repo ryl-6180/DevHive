@@ -65,8 +65,12 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 		.then((response) => response.json())
 		.then((data) => {
 			const items = data.Items;
+			link.parentNode.style.position = "relative";
+			link.style.position = "relative";
+			link.style.display = "block";
 			if (items == "") {
-				throw new Error("在庫切れ？");
+				const errorMessage = "検索結果にページが存在しません。または在庫切れです。";
+				throw new Error(`${errorMessage} : ${link.href}`);
 			}
 			for (const item of items) {
 				// console.log(item.Item.itemUrl);
@@ -78,9 +82,13 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					const priceNode = document.createTextNode(price);
 
 					let wrapperDiv = document.createElement("div");
+
+					// position:topをaタグの左上に来るようにしたい
+					// offsetでいけるか？
 					// スタイルをまとめて設定する関数を呼び出す
 					setStyles(wrapperDiv, {
 						position: "absolute",
+						top: "0",
 						zIndex: "9999",
 						backgroundColor: "rgba(255,0,0,0.8)",
 						color: "#fff",
@@ -90,14 +98,16 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					});
 					// 要素にテキストノードを追加
 					wrapperDiv.appendChild(priceNode);
-					// aタグの前に新しい要素を挿入
-					link.parentNode.insertBefore(wrapperDiv, link);
+					// aタグの中に新しい要素を挿入
+					// console.log(link);
+					link.insertBefore(wrapperDiv, link.firstElementChild);
 					break;
 				} else {
 					let wrapperDiv = document.createElement("div");
 					// スタイルをまとめて設定する関数を呼び出す
 					setStyles(wrapperDiv, {
 						position: "absolute",
+						top: "0",
 						zIndex: "9999",
 						backgroundColor: "rgba(0,0,0,0.8)",
 						color: "#fff",
@@ -107,17 +117,18 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					});
 					// 要素にテキストノードを追加
 					wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-					// aタグの前に新しい要素を挿入
-					link.parentNode.insertBefore(wrapperDiv, link);
+					// aタグの中に新しい要素を挿入
+					link.insertBefore(wrapperDiv, link.firstElementChild);
 				}
 			}
 		})
 		.catch((error) => {
-			console.error("Error:", error);
+			console.error(error);
 			let wrapperDiv = document.createElement("div");
 			// スタイルをまとめて設定する関数を呼び出す
 			setStyles(wrapperDiv, {
 				position: "absolute",
+				top: "0",
 				zIndex: "9999",
 				backgroundColor: "rgba(0,0,0,0.8)",
 				color: "#fff",
@@ -127,8 +138,8 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 			});
 			// 要素にテキストノードを追加
 			wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-			// aタグの前に新しい要素を挿入
-			link.parentNode.insertBefore(wrapperDiv, link);
+			// aタグの中に新しい要素を挿入
+			link.insertBefore(wrapperDiv, link.firstElementChild);
 		});
 }
 
@@ -136,7 +147,7 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 function executeRequestsSequentially(shopCode, links, currentIndex) {
 	if (currentIndex >= links.length) {
 		console.log("価格チェック終了");
-		alert("チェック完了しました！");
+		alert("チェック完了しました！\n「取得エラー」の詳細はコンソールからご確認ください。");
 		return; // リンクの全ての要素を処理したら終了
 	}
 
