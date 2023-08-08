@@ -56,18 +56,33 @@ function checkURLContainsSpecificString(url, searchString) {
 	return url.includes(searchString);
 }
 
+// 要素の左上の座標を取得する
+function getElementOffset(el) {
+	let offsetX = 0;
+	let offsetY = 0;
+
+	while (el) {
+		offsetX += el.offsetLeft;
+		offsetY += el.offsetTop;
+		el = el.offsetParent;
+	}
+
+	return {x: offsetX, y: offsetY};
+}
+
 // 商品価格を取得してaタグに追加する関数
 function addPriceToLink(apiEndpoint, link, keyword) {
 	// console.log(apiEndpoint);
 	// console.log(link);
 	// console.log("keyword",keyword);
+	const topLeftCoordinates = getElementOffset(link);
 	fetch(apiEndpoint)
 		.then((response) => response.json())
 		.then((data) => {
 			const items = data.Items;
-			link.parentNode.style.position = "relative";
-			link.style.position = "relative";
-			link.style.display = "block";
+			// link.parentNode.style.position = "relative";
+			// link.style.position = "relative";
+			// link.style.display = "block";
 			if (items == "") {
 				const errorMessage = "検索結果にページが存在しません。または在庫切れです。";
 				throw new Error(`${errorMessage} : ${link.href}`);
@@ -83,12 +98,11 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 
 					let wrapperDiv = document.createElement("div");
 
-					// position:topをaタグの左上に来るようにしたい
-					// offsetでいけるか？
 					// スタイルをまとめて設定する関数を呼び出す
 					setStyles(wrapperDiv, {
 						position: "absolute",
-						top: "0",
+						top: `${topLeftCoordinates.y}px`,
+						left: `${topLeftCoordinates.x}px`,
 						zIndex: "9999",
 						backgroundColor: "rgba(255,0,0,0.8)",
 						color: "#fff",
@@ -98,16 +112,17 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					});
 					// 要素にテキストノードを追加
 					wrapperDiv.appendChild(priceNode);
-					// aタグの中に新しい要素を挿入
+					// aタグに隣接する要素を挿入
 					// console.log(link);
-					link.insertBefore(wrapperDiv, link.firstElementChild);
+					link.insertAdjacentElement("afterend", wrapperDiv);
 					break;
 				} else {
 					let wrapperDiv = document.createElement("div");
 					// スタイルをまとめて設定する関数を呼び出す
 					setStyles(wrapperDiv, {
 						position: "absolute",
-						top: "0",
+						top: `${topLeftCoordinates.y}px`,
+						left: `${topLeftCoordinates.x}px`,
 						zIndex: "9999",
 						backgroundColor: "rgba(0,0,0,0.8)",
 						color: "#fff",
@@ -117,8 +132,8 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					});
 					// 要素にテキストノードを追加
 					wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-					// aタグの中に新しい要素を挿入
-					link.insertBefore(wrapperDiv, link.firstElementChild);
+					// aタグに隣接する要素を挿入
+					link.insertAdjacentElement("afterend", wrapperDiv);
 				}
 			}
 		})
@@ -128,7 +143,8 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 			// スタイルをまとめて設定する関数を呼び出す
 			setStyles(wrapperDiv, {
 				position: "absolute",
-				top: "0",
+				top: `${topLeftCoordinates.y}px`,
+				left: `${topLeftCoordinates.x}px`,
 				zIndex: "9999",
 				backgroundColor: "rgba(0,0,0,0.8)",
 				color: "#fff",
@@ -138,13 +154,14 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 			});
 			// 要素にテキストノードを追加
 			wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-			// aタグの中に新しい要素を挿入
-			link.insertBefore(wrapperDiv, link.firstElementChild);
+			// aタグに隣接する要素を挿入
+			link.insertAdjacentElement("afterend", wrapperDiv);
 		});
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(shopCode, links, currentIndex) {
+	// console.time();
 	if (currentIndex >= links.length) {
 		console.log("価格チェック終了");
 		alert("チェック完了しました！\n「取得エラー」の詳細はコンソールからご確認ください。");
@@ -164,7 +181,8 @@ function executeRequestsSequentially(shopCode, links, currentIndex) {
 	// 次のリクエストを1秒後に実行する
 	setTimeout(function () {
 		executeRequestsSequentially(shopCode, links, currentIndex + 1);
-	}, 500);
+	}, 1000);
+	// console.timeEnd();
 }
 // 実行ボタンをクリックしたときに処理を開始する関数
 function startPriceCheck() {
@@ -187,7 +205,7 @@ function startPriceCheck() {
 			matchedLinks.push(link);
 		}
 	}
-	// リクエストを1秒ずつ間隔を空けて実行する
+	// リクエストを間隔を空けて実行する
 	console.log("価格チェック開始");
 	executeRequestsSequentially(shopCode, matchedLinks, 0);
 }
