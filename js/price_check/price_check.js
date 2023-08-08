@@ -9,18 +9,16 @@ formDiv.style.border = "2px solid #f00";
 formDiv.style.padding = "0.5rem";
 
 const appLabel = document.createElement("label");
-appLabel.innerHTML = "ショップコードを入力してください";
+appLabel.value = "価格チェック";
 appLabel.style.display = "block";
 appLabel.style.fontSize = "1rem";
-formDiv.appendChild(appLabel);
 
 const shopCodeInput = document.createElement("input");
 shopCodeInput.id = "shopCodeInput";
 shopCodeInput.type = "text";
-// shopCodeInput.value = "z-mall";
-shopCodeInput.placeholder = "z-craft"; // テキストボックスにプレースホルダーを追加
+shopCodeInput.placeholder = "ショップコードを入力してください"; // テキストボックスにプレースホルダーを追加
 shopCodeInput.style.fontSize = "1rem";
-shopCodeInput.style.width = "10rem";
+shopCodeInput.style.width = "17rem";
 formDiv.appendChild(shopCodeInput);
 
 const executeButton = document.createElement("button");
@@ -52,57 +50,22 @@ function setStyles(element, styles) {
 	}
 }
 
-function checkURLContainsSpecificString(url, searchString) {
-	return url.includes(searchString);
-}
-
-// 要素の左上の座標を取得する
-function getElementOffset(el) {
-	let offsetX = 0;
-	let offsetY = 0;
-
-	while (el) {
-		offsetX += el.offsetLeft;
-		offsetY += el.offsetTop;
-		el = el.offsetParent;
-	}
-
-	return {x: offsetX, y: offsetY};
-}
-
 // 商品価格を取得してaタグに追加する関数
 function addPriceToLink(apiEndpoint, link, keyword) {
-	// console.log(apiEndpoint);
-	// console.log(link);
-	// console.log("keyword",keyword);
-	const topLeftCoordinates = getElementOffset(link);
 	fetch(apiEndpoint)
 		.then((response) => response.json())
 		.then((data) => {
 			const items = data.Items;
-			// link.parentNode.style.position = "relative";
-			// link.style.position = "relative";
-			// link.style.display = "block";
-			if (items == "") {
-				const errorMessage = "検索結果にページが存在しません。または在庫切れです。";
-				throw new Error(`${errorMessage} : ${link.href}`);
-			}
+			let count = 0;
 			for (const item of items) {
-				// console.log(item.Item.itemUrl);
-				const url = item.Item.itemUrl;
-				const searchString = keyword;
-				const isMatch = checkURLContainsSpecificString(url, searchString);
-				if (isMatch) {
+				if (item.Item.itemUrl.endsWith(keyword)) {
 					const price = item.Item.itemPrice + "円"; // 商品価格を取得
 					const priceNode = document.createTextNode(price);
 
 					let wrapperDiv = document.createElement("div");
-
 					// スタイルをまとめて設定する関数を呼び出す
 					setStyles(wrapperDiv, {
 						position: "absolute",
-						top: `${topLeftCoordinates.y}px`,
-						left: `${topLeftCoordinates.x}px`,
 						zIndex: "9999",
 						backgroundColor: "rgba(255,0,0,0.8)",
 						color: "#fff",
@@ -112,77 +75,35 @@ function addPriceToLink(apiEndpoint, link, keyword) {
 					});
 					// 要素にテキストノードを追加
 					wrapperDiv.appendChild(priceNode);
-					// aタグに隣接する要素を挿入
-					// console.log(link);
-					link.insertAdjacentElement("afterend", wrapperDiv);
+					// aタグの前に新しい要素を挿入
+					link.parentNode.insertBefore(wrapperDiv, link);
 					break;
-				} else {
-					let wrapperDiv = document.createElement("div");
-					// スタイルをまとめて設定する関数を呼び出す
-					setStyles(wrapperDiv, {
-						position: "absolute",
-						top: `${topLeftCoordinates.y}px`,
-						left: `${topLeftCoordinates.x}px`,
-						zIndex: "9999",
-						backgroundColor: "rgba(0,0,0,0.8)",
-						color: "#fff",
-						fontSize: "1.5rem",
-						border: "2px solid red",
-						padding: "1rem",
-					});
-					// 要素にテキストノードを追加
-					wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-					// aタグに隣接する要素を挿入
-					link.insertAdjacentElement("afterend", wrapperDiv);
 				}
+				count++;
 			}
 		})
-		.catch((error) => {
-			console.error(error);
-			let wrapperDiv = document.createElement("div");
-			// スタイルをまとめて設定する関数を呼び出す
-			setStyles(wrapperDiv, {
-				position: "absolute",
-				top: `${topLeftCoordinates.y}px`,
-				left: `${topLeftCoordinates.x}px`,
-				zIndex: "9999",
-				backgroundColor: "rgba(0,0,0,0.8)",
-				color: "#fff",
-				fontSize: "1.5rem",
-				border: "2px solid red",
-				padding: "1rem",
-			});
-			// 要素にテキストノードを追加
-			wrapperDiv.appendChild(document.createTextNode("取得エラー"));
-			// aタグに隣接する要素を挿入
-			link.insertAdjacentElement("afterend", wrapperDiv);
-		});
+		.catch((error) => console.error("Error:", error));
 }
 
 // リクエストを1秒ずつ間隔を空けて実行する関数
 function executeRequestsSequentially(shopCode, links, currentIndex) {
-	// console.time();
 	if (currentIndex >= links.length) {
-		console.log("価格チェック終了");
-		alert("チェック完了しました！\n「取得エラー」の詳細はコンソールからご確認ください。");
+		console.log("おわった");
+		alert("オワリマシタ");
 		return; // リンクの全ての要素を処理したら終了
 	}
 
 	let link = links[currentIndex];
 	let url = link.href.split("/");
-	// console.log(url[4]);
-	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url[4] + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
+	let apiEndpoint = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&keyword=" + url[3] + "&shopCode=" + shopCode + "&applicationId=" + applicationId;
 	// 商品価格を取得してaタグに追加する関数を呼び出す
-	// console.log(link.href.split("/").pop());
-	// console.log("url[4]",url[4]);
-	addPriceToLink(apiEndpoint, link, url[4]);
+	addPriceToLink(apiEndpoint, link, link.href.split("/").pop());
 
 	progressCounter.innerHTML = "進捗（" + (currentIndex + 1) + " / " + links.length + "）";
 	// 次のリクエストを1秒後に実行する
 	setTimeout(function () {
 		executeRequestsSequentially(shopCode, links, currentIndex + 1);
-	}, 1000);
-	// console.timeEnd();
+	}, 500);
 }
 // 実行ボタンをクリックしたときに処理を開始する関数
 function startPriceCheck() {
@@ -205,10 +126,7 @@ function startPriceCheck() {
 			matchedLinks.push(link);
 		}
 	}
-	// リクエストを間隔を空けて実行する
+	// リクエストを1秒ずつ間隔を空けて実行する
 	console.log("価格チェック開始");
 	executeRequestsSequentially(shopCode, matchedLinks, 0);
 }
-
-// 開発用
-// startPriceCheck();
